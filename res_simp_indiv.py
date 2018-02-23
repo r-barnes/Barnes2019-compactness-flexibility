@@ -62,11 +62,11 @@ data = []
 for t in tolerances:
   for d in dists:
     print(t, GetDistrictID(d))
-    distsimp      = d['geometry'].simplify(t, preserve_topology=True) #Simplify district
-    gj            = json.dumps(shapely.geometry.mapping(distsimp))    #Convert district to GeoJSON
-    scores        = json.loads(mander.getScoresForGeoJSON(gj))["0"]   #Get scores for district using mander
-    scores['id']  = GetDistrictID(d)                                  #Save id to scores
-    scores['tol'] = t                                                 #Save tolerance to scores
+    distsimp      = d['geometry'].simplify(t, preserve_topology=True)         #Simplify district
+    gj            = json.dumps(shapely.geometry.mapping(distsimp))            #Convert district to GeoJSON
+    scores        = json.loads(mander.getUnboundedScoresForGeoJSON(gj))["0"]  #Get scores for district using mander
+    scores['id']  = GetDistrictID(d)                                          #Save id to scores
+    scores['tol'] = t                                                         #Save tolerance to scores
     data.append(scores)
 
 df = pd.DataFrame(data)

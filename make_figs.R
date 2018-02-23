@@ -14,7 +14,12 @@ library(ggrepel)
 
 
 fips   <- list("01"="Alabama", "02"="Alaska", "04"="Arizona", "05"="Arkansas", "06"="California", "08"="Colorado", "09"="Connecticut", "10"="Delaware", "11"="District of Columbia", "12"="Florida", "13"="Georgia", "15"="Hawaii", "16"="Idaho", "17"="Illinois", "18"="Indiana", "19"="Iowa", "20"="Kansas", "21"="Kentucky", "22"="Louisiana", "23"="Maine", "24"="Maryland", "25"="Massachusetts", "26"="Michigan", "27"="Minnesota", "28"="Mississippi", "29"="Missouri", "30"="Montana", "31"="Nebraska", "32"="Nevada", "33"="New Hampshire", "34"="New Jersey", "35"="New Mexico", "36"="New York", "37"="North Carolina", "38"="North Dakota", "39"="Ohio", "40"="Oklahoma", "41"="Oregon", "42"="Pennsylvania", "44"="Rhode Island", "45"="South Carolina", "46"="South Dakota", "47"="Tennessee", "48"="Texas", "49"="Utah", "50"="Vermont", "51"="Virginia", "53"="Washington", "54"="West Virginia", "55"="Wisconsin", "56"="Wyoming", "60"="American Samoa", "66"="Guam", "69"="Commonwealth of the Northern Mariana Islands", "72"="Puerto Rico", "78"="U.S. Virgin Islands")
-fipsab <- list("01"="AL", "02"="AK", "04"="AZ", "05"="AR", "06"="CA", "08"="CO", "09"="CN", "10"="DE", "11"="DC", "12"="FL", "13"="GA", "15"="HI", "16"="ID", "17"="IL", "18"="IN", "19"="IO", "20"="KA", "21"="KY", "22"="LA", "23"="ME", "24"="MD", "25"="MA", "26"="MI", "27"="MN", "28"="MS", "29"="MO", "30"="MT", "31"="NE", "32"="NV", "33"="NH", "34"="NJ", "35"="NM", "36"="NY", "37"="NC", "38"="ND", "39"="OH", "40"="OK", "41"="OR", "42"="PN", "44"="RI", "45"="SC", "46"="SD", "47"="TN", "48"="TX", "49"="UT", "50"="VT", "51"="VA", "53"="WA", "54"="WV", "55"="WI", "56"="WY", "60"="AS", "66"="GU", "69"="MP", "72"="PR", "78"="VI")
+fipsab <- list("01"="AL", "02"="AK", "04"="AZ", "05"="AR", "06"="CA", "08"="CO", "09"="CN", "10"="DE", "11"="DC", "12"="FL", "13"="GA", "15"="HI", "16"="ID", "17"="IL", "18"="IN", "19"="IO", "20"="KA", "21"="KY", "22"="LA", "23"="ME", "24"="MD", "25"="MA", "26"="MI", "27"="MN", "28"="MS", "29"="MO", "30"="MT", "31"="NE", "32"="NV", "33"="NH", "34"="NJ", "35"="NM", "36"="NY", "37"="NC", "38"="ND", "39"="OH", "40"="OK", "41"="OR", "42"="PA", "44"="RI", "45"="SC", "46"="SD", "47"="TN", "48"="TX", "49"="UT", "50"="VT", "51"="VA", "53"="WA", "54"="WV", "55"="WI", "56"="WY", "60"="AS", "66"="GU", "69"="MP", "72"="PR", "78"="VI")
+
+make_geoids_char <- function(x) {
+  x <- as.character(x)
+  str_pad(x, 4, pad = "0")
+}
 
 ################################################################################
 ################################################################################
@@ -34,10 +39,7 @@ data_summary <- function(x) {
    return(c(y=m,ymin=ymin,ymax=ymax))
 }
 
-make_geoids_char <- function(x) {
-  x <- as.character(x)
-  str_pad(x, 4, pad = "0")
-}
+
 
 #############
 #Poster image
@@ -59,15 +61,18 @@ if(!file.exists('fig_simplify_individually_poster.png')){
 
 if(!file.exists('fig_simplify_individually_summary.pdf')){
   #df <- df %>% filter(!(variable %in% c('area','perim')))
-  df2 <- df %>% arrange(tol) %>% group_by(id,variable) %>% mutate(value=value-first(value))
 
-  p <- ggplot(df, aes(x=tol, y=value))+
+  df2 <- df %>% filter(variable %in% c("CvxHullPS", "PolsbyPopp", "ReockPS"))
+  #df2 <- df2 %>% arrange(tol) %>% group_by(id,variable) %>% mutate(value=value-first(value))
+
+  p <- ggplot(df2, aes(x=tol, y=value))+
     facet_wrap(~variable, scales='free', ncol=1)+
     geom_boxplot()+
+    #geom_violin()+
     xlab("Tolerance (m)") +
     ylab("Value")
 
-  ggsave('fig_simplify_individually_summary.pdf', plot=p, height=6, width=4, limitsize=FALSE)
+  ggsave('fig_simplify_individually_summary.pdf', plot=p, height=4, width=4, limitsize=FALSE)
 }
 
 
@@ -464,6 +469,8 @@ if(!file.exists('imgs/fig_koch_1.pdf')){
 
 FindEvil <- function(a, fixid){
 
+  #Score compared to a histogram in which districts without a choice of borders
+  #are included
   diffnc <- a %>% 
         group_by(proj,tol,variable) %>% 
         summarise(
@@ -481,8 +488,10 @@ FindEvil <- function(a, fixid){
         ) %>% 
         mutate(
           choice='nochoice'
-        )
+        ) %>% rowwise()
 
+  #Score compared to a histogram in which district without a choice of
+  #boundaries are excluded
   diffc <- a %>% 
         filter(substr(id,3,4)!='00')     %>%
         group_by(proj,tol,variable) %>% 
@@ -501,8 +510,9 @@ FindEvil <- function(a, fixid){
         ) %>% 
         mutate(
           choice='choice'
-        )
+        ) %>% rowwise()
 
+  #Meld the foregoing
   diff <- rbind(diffnc,diffc)
 
   #Get the "best practices" score which most clearly indicates this district was gerrymandered
@@ -514,27 +524,21 @@ FindEvil <- function(a, fixid){
            filter(as.numeric(levels(tol))[tol]<5000) %>% #Limit the degree of simplification
            arrange(mean_diff) %>% head(n=1)
 
-  print('fixid')
-  print(fixid)
-  print('bestd')
-  print(bestd)
-  print('diffd')
-  print(diffd)
+  cat(paste(fixid,'&',round(bestd$distval,2),'&',round(bestd$mean_diff,2),'&',bestd$proj,'&',bestd$tol,'&',bestd$variable,'&',bestd$choice,"\\\\ \n"))
+  cat(paste(fixid,'&',round(diffd$distval,2),'&',round(diffd$mean_diff,2),'&',diffd$proj,'&',diffd$tol,'&',diffd$variable,'&',diffd$choice,"\\vspace{0.5em} \\\\ \n"))
 
-  print('--------------------------------')
-
-
-  #Histogram showing the differences for the best practices settings
-  besthist <- a %>% filter(proj=='EPSG:102003' & tol==0 & variable==bestd$variable)
+  #Histogram making the district look bad
+  besthist <- a %>% filter(proj==bestd$proj & tol==bestd$tol & variable==bestd$variable)
   if(bestd$choice=='choice'){
     besthist <- besthist %>% filter(substr(id,3,4)!='00') 
   }
 
-  #Histogram showing the differences for the evil practices settings
+  #Histogram making the district look good
   diffhist <- a %>% filter(proj==diffd$proj & tol==diffd$tol & variable==diffd$variable)
   if(diffd$choice=='choice'){
     diffhist <- diffhist %>% filter(substr(id,3,4)!='00') 
   }
+
 
   style <-  theme_void() +
         theme(
@@ -559,9 +563,25 @@ inp <- read.csv('out_fix.csv', colClasses=c('character','character','character',
 a   <- inp %>% filter(proj!='input') %>% filter(!(variable %in% c('perimSH', 'areaSH', 'areaAH', 'HoleCount')))
 #a   <- a %>% filter(variable!='CvxHullPTB')
 
-dists_to_fix <- c('2403','3712','2402','1205','3701','4207','4833','3704','1704','4835')
+a$proj = gsub('local_lcc','Local LCC',a$proj)
+a$proj = gsub('local_alb','Local AEA',a$proj)
+a$proj = gsub('local_alb','Local AEA',a$proj)
+a$proj = gsub("(^|[[:space:]])([[:alpha:]])", "\\1\\U\\2", a$proj, perl=TRUE)
 
+idredo <- function(x){
+  paste0(fipsab[substr(x, 1, 2)],substr(x, 3, 4))
+}
+
+a$id = idredo(a$id)
+
+
+dists_to_fix <- c('2403','3712','2402','1205','3701','4207','4833','3704','1704','4835')
+dists_to_fix = idredo(dists_to_fix)
+
+cat("\\begin{tabular}{lllllll}\n")
+cat("District & Score Value & Diff from Mean & Score Name & Tolerance & Projection & Choice \\\\ \\hline \n")
 for(fixid in dists_to_fix){
   p<-FindEvil(a,fixid)
   ggsave(paste0('imgs/fig_evil_',fixid,'.pdf'), plot=p, width=1, height=0.5)
 }
+cat("\\end{tabular}\n")

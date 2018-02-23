@@ -136,34 +136,4 @@ df = pd.melt(df, id_vars=['id', 'proj', 'ptype', 'ptopo', 'tol'])
 #Save results
 df.to_csv('out_fix.csv', index=False)
 
-dists_to_fix = ['2403','3712','2402','1205','3701','4207','4833','3704','1704','4835']
-br = pd.DataFrame()
-for fix in dists_to_fix:
-  for proj in df.proj.unique():
-    for tol in df.tol.unique():
-      for ptopo in df.ptopo.unique():
-        for var in df.variable.unique():
-          for choice in [True,False]:    #Exclude districts if there was no choice in their layout
-            a = df[(df.proj == proj) & (df.tol == tol) & (df.ptopo==ptopo) & (df.variable==var)]
-            if not choice:
-              multi_district = a.apply(lambda x: x.id[2:]!='00', axis=1)
-              a = a[multi_district]
-            br = br.append({
-              'fix':       fix,
-              'proj':      proj,
-              'tol':       tol,
-              'ptopo':     ptopo,
-              'var':       var,
-              'choice':    choice,
-              'med_diff':  abs(a.value.median()-a[a['id']==fix].value),
-              'mean_diff': abs(a.value.mean()-a[a['id']==fix].value)
-            }, ignore_index=True)
-
-pickle.dump(br, open('res_fig_br.pickle', 'wb'))
-br = pickle.load(open('res_fig_br.pickle', 'rb'))
-
-dists_to_fix_scores =  df[df['id'].isin(dists_to_fix)]
-
-brbest = br[(br.proj=='EPSG:102003') & (br.tol==0) & (br.ptopo==True) & (br.choice==False)]
-
-br.sort_values(['med_diff'])
+#Analysis continues in `make_figs.R`
