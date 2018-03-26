@@ -1,5 +1,5 @@
-Barnes2018-Landscape
-============================
+Barnes2018-compactness-implementation
+=====================================
 
 **Title of Manuscript**:
 Gerrymandering and Compactness: Implementation Flexibility and Abuse
