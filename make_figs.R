@@ -298,7 +298,7 @@ df       <- read.table('scores.csv', header=TRUE) #TODO
 df$GEOID <- make_geoids_char(df$GEOID)
 df$STATEFP <- as.factor(df$STATEFP)
 
-print("Histogrma of number of districts per state")
+print("Histogram of number of districts per state")
 df2 <- df %>% select(STATEFP)      %>%
               group_by(STATEFP)    %>% 
               summarise(count=n()) %>%
