@@ -8,7 +8,7 @@ library(stringr)
 library(gridExtra)
 library(scales)
 library(GGally)
-library(mandeR)
+# library(mandeR)
 library(xtable)
 library(ggrepel)
 
@@ -163,6 +163,28 @@ if(!file.exists('imgs/fig_projections.pdf')){
   df <- df %>% filter(proj!='input')
   df <- df %>% filter(ptype!='national')
 
+  max_diff_between_groups = function(a,b) {
+    amin=min(a)
+    amax=max(a)
+    bmin=min(b)
+    bmax=max(b)
+    max(abs(amin-bmax), abs(amax-bmin))
+  }
+
+  #Extract the local values and the nonlocal values, form an all-pairs data
+  #frame, subtract the two columns, and take max. This gives the maximum
+  #difference between the two initial vectors
+  diff_between_projs = function(non_local_var, x){
+    locals = x %>% filter(ptype=='local') %>% select(value)
+    nonlocals = x %>% filter(ptype==non_local_var) %>% select(value)
+    data.frame(diff=max_diff_between_groups(locals,nonlocals))
+  }
+
+  max_conus  = df %>% filter(ptype=='local' | ptype=='conus')  %>% group_by(id,variable) %>% do(diff_between_projs('conus',.))  %>% ungroup() %>% mutate(ptype='conus')
+  max_global = df %>% filter(ptype=='local' | ptype=='global') %>% group_by(id,variable) %>% do(diff_between_projs('global',.)) %>% ungroup() %>% mutate(ptype='global')
+
+  maxdiffs = rbind(max_conus, max_global)
+
   is_outlier <- function(v, coef=1.5){
     quantiles <- quantile(v,probs=c(0.25,0.75))
     IQR <- quantiles[2]-quantiles[1]
@@ -170,26 +192,29 @@ if(!file.exists('imgs/fig_projections.pdf')){
     return(res)
   }
 
+  #Used for generating labels on outliers
   idredo <- function(x){
     paste0(fipsab[substr(x, 1, 2)],substr(x, 3, 4))
   }
 
-  df <- df %>% group_by(ptype,variable) %>% mutate(label=ifelse(is_outlier(value) & abs(value-mean(value))>0.07, idredo(id), NA))
+  maxdiffs = maxdiffs %>% mutate(ptype=ifelse(ptype=='conus', 'CONUS',ptype)) %>%
+                          mutate(ptype=ifelse(ptype=='global','Global',ptype))
+
+  maxdiffs_plot = maxdiffs %>% group_by(ptype,variable) %>% mutate(label=ifelse(is_outlier(diff) & abs(diff-mean(diff))>0.07, idredo(id), NA))
 
 
-  p <- ggplot(df, aes(x=ptype, y=value, label=label))+
+  p = ggplot(maxdiffs_plot, aes(x=ptype, y=diff, label=label))+
     scale_x_discrete()+
-#    geom_point()+
     facet_wrap(~variable)+
     geom_boxplot(alpha=0.2, width=1, position = position_dodge(width = 1.5))+
-    geom_text_repel()+
+    geom_text_repel(direction="y", hjust=1.9, size=3, nudge_y=0.05)+
     xlab("")+
     ylab("Range Under Reprojection")+
     theme(axis.text.x = element_text(angle = 45, hjust = 1, size=9))
 
-  df %>% group_by(ptype,variable) %>% summarise(median=median(value), quant=quantile(value, probs=c(0.99)))
+  ggsave('imgs/fig_projections.pdf', plot=p, width=4, height=4, limitsize=FALSE)
 
-  ggsave('imgs/fig_projections.pdf', plot=p, width=3, height=4, limitsize=FALSE)
+  df %>% group_by(ptype,variable) %>% summarise(median=median(value), quant=quantile(value, probs=c(0.99)))
 }
 
 
@@ -208,11 +233,13 @@ if(!file.exists('effect_of_topography.pdf')){
   df <- df %>% select(Dist,Diff)
   df <- melt(df, id.vars=c('Dist'))
 
-  p <- ggplot(df, aes(x=variable, y=value))+
-       geom_boxplot()+
-       theme(axis.text.x=element_blank(), axis.ticks.x=element_blank())+
-       xlab("")+
-       ylab("Difference in Score")
+  p <- ggplot(df, aes(x=value))+
+       # geom_boxplot()+
+       # geom_violin()+
+       geom_histogram()+
+       #theme(axis.text.x=element_blank(), axis.ticks.x=element_blank())+
+       ylab("Incidence")+
+       xlab("Difference in Score")
 
   ggsave('fig_effect_of_topography.pdf', plot=p, width=2, height=2, limitsize=FALSE)
 }
@@ -324,11 +351,14 @@ if(!file.exists('fig_effect_of_misalignment.pdf')){
                 filter(areaAH>=1e8)                           %>%
                 arrange(AreaUncertainty)
 
-  p <- ggplot(df2, aes(x='', y=AreaUncertainty)) +
-    geom_boxplot()+
-    theme(axis.text.x=element_blank(), axis.ticks.x=element_blank())+
-    ylab("% Uncertainty in Area")+
-    xlab("")
+  p <- ggplot(df2, aes(x=AreaUncertainty)) +
+    #geom_boxplot()+
+    # geom_jitter()+
+    # geom_violin()+
+    geom_histogram()+
+    # theme(axis.text.x=element_blank(), axis.ticks.x=element_blank())+
+    xlab("% Uncertainty in Area")+
+    ylab("Incidence")
 
 
   ggsave('fig_effect_of_misalignment.pdf', plot=p, width=2, height=2, limitsize=FALSE)
@@ -365,7 +395,7 @@ if(!file.exists('imgs/fig_score_order.pdf')){
                  theme(axis.title.y = element_text(size=15))
 
   ggsave('imgs/fig_score_order.pdf', plot=p, width=4, height=4, limitsize=FALSE)
-
+}
 
 
 
@@ -418,8 +448,6 @@ a %>% group_by(score) %>% summarise(max(pdiff))
 #KOCH SNOWFLAKE
 ##########################
 
-
-
 if(!file.exists('imgs/fig_koch_1.pdf')){
 
   a <- read.csv('koch.csv', colClasses=c("integer", "character"))
@@ -465,7 +493,9 @@ if(!file.exists('imgs/fig_koch_1.pdf')){
 
 
 
-
+##########################
+#ADVERSARIAL EFFECTS
+##########################
 
 FindEvil <- function(a, fixid){
 
@@ -539,6 +569,11 @@ FindEvil <- function(a, fixid){
     diffhist <- diffhist %>% filter(substr(id,3,4)!='00') 
   }
 
+  print(fixid)
+  print("diffhist")
+  print(diffhist)
+  print("besthist")
+  print(besthist)
 
   style <-  theme_void() +
         theme(
@@ -550,14 +585,21 @@ FindEvil <- function(a, fixid){
           axis.ticks.y     = element_blank(),
         )
 
+  print(paste("Mean difference from mean if only 'choice' is varied",   mean((diff %>% group_by(proj, tol,      variable) %>% summarise(max_mean_diff=max(mean_diff)))$max_mean_diff)))
+  print(paste("Mean difference from mean if only 'variable' is varied", mean((diff %>% group_by(proj, tol,      choice  ) %>% summarise(max_mean_diff=max(mean_diff)))$max_mean_diff)))
+  print(paste("Mean difference from mean if only 'tol' is varied",      mean((diff %>% group_by(proj, variable, choice  ) %>% summarise(max_mean_diff=max(mean_diff)))$max_mean_diff)))
+  print(paste("Mean difference from mean if only 'proj' is varied",     mean((diff %>% group_by(tol,  variable, choice  ) %>% summarise(max_mean_diff=max(mean_diff)))$max_mean_diff)))
+
   p <- grid.arrange(
-    ggplot(besthist, aes(x=value)) + style  + geom_histogram(fill="#C1C1C1", aes(y=..count../max(..count..))) + geom_vline(xintercept=bestd$distval, color='black'),
-    ggplot(diffhist, aes(x=value)) + style  + geom_histogram(fill="#C1C1C1", aes(y=..count../max(..count..))) + geom_vline(xintercept=diffd$distval, color='black'),
+    ggplot(besthist, aes(x=value)) + xlim(c(0,1)) + style  + geom_histogram(fill="#C1C1C1", aes(y=..count../max(..count..))) + geom_vline(xintercept=bestd$distval, color='black'),
+    ggplot(diffhist, aes(x=value)) + xlim(c(0,1)) + style  + geom_histogram(fill="#C1C1C1", aes(y=..count../max(..count..))) + geom_vline(xintercept=diffd$distval, color='black'),
     ncol=1
   )
 
   p
 }
+
+
 
 inp <- read.csv('out_fix.csv', colClasses=c('character','character','character','character','factor','character', 'double'))
 a   <- inp %>% filter(proj!='input') %>% filter(!(variable %in% c('perimSH', 'areaSH', 'areaAH', 'HoleCount')))
@@ -582,6 +624,15 @@ cat("\\begin{tabular}{lllllll}\n")
 cat("District & Score Value & Diff from Mean & Score Name & Tolerance & Projection & Choice \\\\ \\hline \n")
 for(fixid in dists_to_fix){
   p<-FindEvil(a,fixid)
-  ggsave(paste0('imgs/fig_evil_',fixid,'.pdf'), plot=p, width=1, height=0.5)
+  figname = paste0('imgs/fig_evil_',fixid,'.pdf')
+  if(!file.exists(figname)){
+    ggsave(figname, plot=p, width=1, height=0.5)
+  }
+  astate = a %>% filter(startsWith(id,substr(fixid,1,2)))
+  p<-FindEvil(astate,fixid)
+  figname = paste0('imgs/fig_evil_by_state_',fixid,'.pdf')
+  if(!file.exists(figname)){
+    ggsave(figname, plot=p, width=1, height=0.5)
+  }  
 }
 cat("\\end{tabular}\n")
