@@ -1,3 +1,6 @@
 [submodule "submodules/python-mander"]
 	path = submodules/python-mander
 	url = git@github.com:gerrymandr/python-mander.git
+[submodule "submodules/compactness-cli"]
+	path = submodules/compactness-cli
+	url = git@github.com:r-barnes/compactness-cli.git
