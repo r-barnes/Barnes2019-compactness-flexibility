@@ -5,3 +5,5 @@ a.out
 *.exe
 *.pickle
 *.pdf
+build/
+bin/
