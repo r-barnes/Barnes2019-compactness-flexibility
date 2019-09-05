@@ -3,3 +3,5 @@
 __pycache__
 a.out
 *.exe
+*.pickle
+*.pdf
