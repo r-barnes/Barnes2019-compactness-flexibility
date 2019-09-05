@@ -59,7 +59,7 @@ else:
 #Simplify each district with one of several tolerances. Gather the resulting
 #scores.
 if not (os.path.exists('out_simplify_together.pickle') and os.path.exists('out_simplify_together.csv')):
-  for res in ['500k','5m','20m']:
+  for filename in shapefiles:
     #Load data from shapefile
     in_fiona    = fiona.open(filename)
     in_prj      = in_fiona.crs
@@ -69,10 +69,10 @@ if not (os.path.exists('out_simplify_together.pickle') and os.path.exists('out_s
       d['geometry'] = shapely.geometry.shape(d['geometry'])
       #Project all districts to a reasonable projection for the whole US
       d['geometry'] = Reproject(d['geometry'], in_prj, '+proj=gs50')    
-      gj             = json.dumps(shapely.geometry.mapping(d['geometry'])) #Convert district to GeoJSON
-      scores         = json.loads(mander.getScoresForGeoJSON(gj))["0"]     #Get scores for district using mander
-      scores['id']   = GetDistrictID(d)                                    #Save id to scores
-      scores['res']  = GetResFromName(filename)                            #Save resolution to scores
+      gj             = json.dumps(shapely.geometry.mapping(d['geometry']))       #Convert district to GeoJSON
+      scores         = json.loads(mander.getUnboundedScoresForGeoJSON(gj))["0"]  #Get scores for district using mander
+      scores['id']   = GetDistrictID(d)                                          #Save id to scores
+      scores['res']  = GetResFromName(filename)                                  #Save resolution to scores
       scores['geom'] = d['geometry']
       scores['name'] = common.fips[d['properties']['STATEFP']]['name']+" "+d['properties']['CD114FP']
       data.append(scores)
@@ -82,11 +82,11 @@ if not (os.path.exists('out_simplify_together.pickle') and os.path.exists('out_s
   df = pd.melt(df, id_vars=['id', 'res', 'name'])
 
   #Save results
-  df.to_csv('out_simplify_together.csv', index=False)
+  df.to_csv('output/out_simplify_together.csv', index=False)
 
-  pickle.dump(data, open('out_simplify_together.pickle', 'wb'))
+  pickle.dump(data, open('output/out_simplify_together.pickle', 'wb'))
 
-data = pickle.load(open('out_simplify_together.pickle', 'rb'))
+data = pickle.load(open('output/out_simplify_together.pickle', 'rb'))
 
 if sys.argv[1][0:2]=="-p":
   print("Building images...")
@@ -99,43 +99,42 @@ if sys.argv[1][0:2]=="-p":
     dists_to_plot = sorted([x for x in data if x['id'] == tp], key=lambda x: order[x['res']])
     districtplot.PlotDistricts(dists_to_plot, 'res_book/img_st_{0}_{{i}}.png'.format(tp))
 
+  entry = """
+  \\begin{{minipage}}{{\columnwidth}}
+  \\begin{{tabular}}{{ccc}}
+  \\includegraphics[width=2cm]{{img_st_{fname}_0.png}} &
+  \\includegraphics[width=2cm]{{img_st_{fname}_1.png}} &
+  \\includegraphics[width=2cm]{{img_st_{fname}_2.png}} \\\\
+  \\pscore{{{pscore0}}} & \pscore{{{pscore1}}} & \pscore{{{pscore2}}} \\\\
+  \\cscore{{{cscore0}}} & \cscore{{{cscore1}}} & \cscore{{{cscore2}}}
+  \\end{{tabular}}
+  \\imtitle{{{dname}}}
+  \\end{{minipage}}
+  """
 
-entry = """
-\\begin{{minipage}}{{\columnwidth}}
-\\begin{{tabular}}{{ccc}}
-\\includegraphics[width=2cm]{{img_st_{fname}_0.png}} &
-\\includegraphics[width=2cm]{{img_st_{fname}_1.png}} &
-\\includegraphics[width=2cm]{{img_st_{fname}_2.png}} \\\\
-\\pscore{{{pscore0}}} & \pscore{{{pscore1}}} & \pscore{{{pscore2}}} \\\\
-\\cscore{{{cscore0}}} & \cscore{{{cscore1}}} & \cscore{{{cscore2}}}
-\\end{{tabular}}
-\\imtitle{{{dname}}}
-\\end{{minipage}}
-"""
-
-print("Printing book...")
-fout = open('res_book/entries.tex', 'w')
-ids = list(set([x['id'] for x in data]))
-ids.sort()
-oldname = None
-for tp in ids:
-  print(tp)
-  dists_to_plot = sorted([x for x in data if x['id'] == tp], key=lambda x: order[x['res']])
-  if len(dists_to_plot)<3:
-    continue
-  if oldname!=dists_to_plot[0]['name'][0:5]:
-    this_name = dists_to_plot[0]['name']
-    oldname   = this_name[0:5]
-    fout.write('\\bchap{{{0}}}'.format(this_name[0:this_name.find('#')-1]))
-  fout.write(entry.format(
-    fname   = tp,
-    dname   = dists_to_plot[0]['name'].replace('#',''),
-    pscore0 = dists_to_plot[0]['PolsbyPopp'],
-    pscore1 = dists_to_plot[1]['PolsbyPopp'],
-    pscore2 = dists_to_plot[2]['PolsbyPopp'],
-    cscore0 = dists_to_plot[0]['ConvexHull'],
-    cscore1 = dists_to_plot[1]['ConvexHull'],
-    cscore2 = dists_to_plot[2]['ConvexHull']
-  ))
-fout.close()
-del fout
+  print("Printing book...")
+  fout = open('res_book/entries.tex', 'w')
+  ids = list(set([x['id'] for x in data]))
+  ids.sort()
+  oldname = None
+  for tp in ids:
+    print(tp)
+    dists_to_plot = sorted([x for x in data if x['id'] == tp], key=lambda x: order[x['res']])
+    if len(dists_to_plot)<3:
+      continue
+    if oldname!=dists_to_plot[0]['name'][0:5]:
+      this_name = dists_to_plot[0]['name']
+      oldname   = this_name[0:5]
+      fout.write('\\bchap{{{0}}}'.format(this_name[0:this_name.find('#')-1]))
+    fout.write(entry.format(
+      fname   = tp,
+      dname   = dists_to_plot[0]['name'].replace('#',''),
+      pscore0 = dists_to_plot[0]['PolsbyPopp'],
+      pscore1 = dists_to_plot[1]['PolsbyPopp'],
+      pscore2 = dists_to_plot[2]['PolsbyPopp'],
+      cscore0 = dists_to_plot[0]['ConvexHull'],
+      cscore1 = dists_to_plot[1]['ConvexHull'],
+      cscore2 = dists_to_plot[2]['ConvexHull']
+    ))
+  fout.close()
+  del fout

@@ -24,7 +24,7 @@ make_geoids_char <- function(x) {
 ################################################################################
 ################################################################################
 
-df <- read.csv('out_simplify_individually.csv')
+df <- read.csv('output/out_simplify_individually.csv')
 #df <- df %>% filter(!(variable %in% c('area','perim'))) #Exclude area and perim
 df$id <- make_geoids_char(df$id)
 
@@ -44,7 +44,7 @@ data_summary <- function(x) {
 #############
 #Poster image
 
-if(!file.exists('fig_simplify_individually_poster.png')){
+if(!file.exists('imgs/fig_simplify_individually_poster.png')){
   p <-  ggplot(df, aes(x=id, y=value))+
         facet_wrap(~variable, scales='free', ncol=1)+
         scale_x_discrete()+
@@ -56,10 +56,10 @@ if(!file.exists('fig_simplify_individually_poster.png')){
         guides(color=guide_legend(title="Simplification\nTolerance (m)"))+
         scale_colour_brewer(type="div", palette="RdYlGn", direction=-1)
 
-  ggsave('fig_simplify_individually_poster.png', plot=p, height=10, width=30, limitsize=FALSE)
+  ggsave('imgs/fig_simplify_individually_poster.png', plot=p, height=10, width=30, limitsize=FALSE)
 }
 
-if(!file.exists('fig_simplify_individually_summary.pdf')){
+if(!file.exists('imgs/fig_simplify_individually_summary.pdf')){
   #df <- df %>% filter(!(variable %in% c('area','perim')))
 
   df2 <- df %>% filter(variable %in% c("CvxHullPS", "PolsbyPopp", "ReockPS"))
@@ -72,7 +72,7 @@ if(!file.exists('fig_simplify_individually_summary.pdf')){
     xlab("Tolerance (m)") +
     ylab("Value")
 
-  ggsave('fig_simplify_individually_summary.pdf', plot=p, height=4, width=4, limitsize=FALSE)
+  ggsave('imgs/fig_simplify_individually_summary.pdf', plot=p, height=4, width=4, limitsize=FALSE)
 }
 
 
@@ -80,10 +80,10 @@ if(!file.exists('fig_simplify_individually_summary.pdf')){
 ################################################################################
 
 
-if(!file.exists('img/fig_simplify_together_summary.pdf')){
+if(!file.exists('imgs/fig_simplify_together_summary.pdf')){
   #df <- df %>% filter(!(variable %in% c('area','perim')))
 
-  df <- read.csv('out_simplify_together.csv', colClasses=c("character","character","character","character","double"))
+  df <- read.csv('output/out_simplify_together.csv', colClasses=c("character","character","character","character","double"))
   #df <- df %>% filter(!(variable %in% c('area','perim'))) #Exclude area and perim
 
   #Set area and perim on a log scale
@@ -158,7 +158,7 @@ if(!file.exists('img/fig_simplify_together_summary.pdf')){
 
 
 if(!file.exists('imgs/fig_projections.pdf')){
-  df <- read.csv('out_projections.csv', colClasses=c("character","character","character","character","double"))
+  df <- read.csv('output/out_projections.csv', colClasses=c("character","character","character","character","double"))
   df <- df %>% filter(variable %in% c('CvxHullPS', 'CvxHullPT', 'PolsbyPopp', 'ReockPS', 'ReockPT', 'Schwartzbe'))
   df <- df %>% filter(proj!='input')
   df <- df %>% filter(ptype!='national')
@@ -223,8 +223,8 @@ if(!file.exists('imgs/fig_projections.pdf')){
 ################################################################################
 ################################################################################
 
-if(!file.exists('effect_of_topography.pdf')){
-  df <- read.table('effect_of_topography.tbl', header=TRUE, colClasses=c("character","double","double","double","double"))
+if(!file.exists('imgs/effect_of_topography.pdf')){
+  df <- read.table('output/effect_of_topography.tbl', header=TRUE, colClasses=c("character","double","double","double","double"))
   df <- df %>% mutate(SAfromTopo=ifelse(SAfromTopo==0,1,SAfromTopo))
   df <- df %>% filter(SAwoTopo>0) %>% filter(SAwTopo>0)
 
@@ -268,8 +268,8 @@ if(!file.exists('effect_of_topography.pdf')){
 ################################################################################
 ################################################################################
 
-if(!file.exists('fig_effect_of_borders.pdf')){
-  df       <- read.table('scores.csv', header=TRUE) #TODO
+if(!file.exists('imgs/fig_effect_of_borders.pdf')){
+  df       <- read.table('output/scores.csv', header=TRUE) #TODO
   df$GEOID <- make_geoids_char(df$GEOID)
 
   diffs <- df %>% group_by(substr(GEOID,1,2)) %>% filter(n()>1)   %>% ungroup() %>%
@@ -286,7 +286,7 @@ if(!file.exists('fig_effect_of_borders.pdf')){
     ylab("Difference in Score")+
     xlab("")
 
-  ggsave('fig_effect_of_borders.pdf', plot=p, width=2, height=2, limitsize=FALSE)
+  ggsave('output/fig_effect_of_borders.pdf', plot=p, width=2, height=2, limitsize=FALSE)
 }
 
 
@@ -294,8 +294,8 @@ if(!file.exists('fig_effect_of_borders.pdf')){
 ################################################################################
 
 
-if(!file.exists('fig_effect_of_definitions.pdf')){
-  df       <- read.table('scores.csv', header=TRUE) #TODO
+if(!file.exists('imgs/fig_effect_of_definitions.pdf')){
+  df       <- read.table('output/scores.csv', header=TRUE) #TODO
   df$GEOID <- make_geoids_char(df$GEOID)
 
   diffs <- df %>% group_by(substr(GEOID,1,2)) %>% filter(n()>1)  %>% ungroup() %>%
@@ -312,7 +312,7 @@ if(!file.exists('fig_effect_of_definitions.pdf')){
     ylab("Difference in Score")+
     xlab("")
 
-  ggsave('fig_effect_of_definitions.pdf', plot=p, width=2, height=2, limitsize=FALSE)
+  ggsave('imgs/fig_effect_of_definitions.pdf', plot=p, width=2, height=2, limitsize=FALSE)
 }
 
 
@@ -321,7 +321,7 @@ if(!file.exists('fig_effect_of_definitions.pdf')){
 ################################################################################
 
 #Electoral districts per state
-df       <- read.table('scores.csv', header=TRUE) #TODO
+df       <- read.table('output/scores.csv', header=TRUE) #TODO
 df$GEOID <- make_geoids_char(df$GEOID)
 df$STATEFP <- as.factor(df$STATEFP)
 
@@ -340,8 +340,8 @@ df2 <- df %>% select(STATEFP)      %>%
 
 #Misaligned borders
 
-if(!file.exists('fig_effect_of_misalignment.pdf')){
-  df       <- read.table('scores.csv', header=TRUE) #TODO
+if(!file.exists('imgs/fig_effect_of_misalignment.pdf')){
+  df       <- read.table('output/scores.csv', header=TRUE) #TODO
   df$GEOID <- make_geoids_char(df$GEOID)
   df$STATEFP <- as.factor(df$STATEFP)
 
@@ -361,7 +361,7 @@ if(!file.exists('fig_effect_of_misalignment.pdf')){
     ylab("Incidence")
 
 
-  ggsave('fig_effect_of_misalignment.pdf', plot=p, width=2, height=2, limitsize=FALSE)
+  ggsave('imgs/fig_effect_of_misalignment.pdf', plot=p, width=2, height=2, limitsize=FALSE)
 }
 
 
@@ -450,7 +450,7 @@ a %>% group_by(score) %>% summarise(max(pdiff))
 
 if(!file.exists('imgs/fig_koch_1.pdf')){
 
-  a <- read.csv('koch.csv', colClasses=c("integer", "character"))
+  a <- read.csv('output/koch.csv', colClasses=c("integer", "character"))
   a <- a %>% mutate(geomo=st_as_sfc(geom))
   a <- a %>% filter(level>0) %>% filter(level<=8)
   a <- cbind(a, a %>% rowwise() %>% do(mandeR::getScoresForWKT(.$geom)))
@@ -601,7 +601,7 @@ FindEvil <- function(a, fixid){
 
 
 
-inp <- read.csv('out_fix.csv', colClasses=c('character','character','character','character','factor','character', 'double'))
+inp <- read.csv('output/out_fix.csv', colClasses=c('character','character','character','character','factor','character', 'double'))
 a   <- inp %>% filter(proj!='input') %>% filter(!(variable %in% c('perimSH', 'areaSH', 'areaAH', 'HoleCount')))
 #a   <- a %>% filter(variable!='CvxHullPTB')
 

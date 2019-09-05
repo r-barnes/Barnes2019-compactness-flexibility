@@ -73,4 +73,4 @@ df = pd.DataFrame(data)
 df = pd.melt(df, id_vars=['id', 'tol'])
 
 #Save results
-df.to_csv('out_simplify_individually.csv', index=False)
+df.to_csv('output/out_simplify_individually.csv', index=False)

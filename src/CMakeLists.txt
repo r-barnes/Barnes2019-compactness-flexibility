@@ -13,3 +13,15 @@ install(
   TARGETS koch.exe augmenter.exe
   RUNTIME DESTINATION ${CMAKE_SOURCE_DIR}/bin
 )
+
+install(
+  FILES common.py districtplot.py
+  DESTINATION ${CMAKE_SOURCE_DIR}/bin
+  PERMISSIONS OWNER_READ
+)
+
+install(
+  FILES res_bounded.py res_fig_gerrymandering.py res_projections.py res_simp_indiv.py res_simp_together.py
+  DESTINATION ${CMAKE_SOURCE_DIR}/bin
+  PERMISSIONS OWNER_EXECUTE
+)

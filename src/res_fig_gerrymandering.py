@@ -126,14 +126,14 @@ params = itertools.product(dists,projections,tolerances,ptopos)
 pool   = multiprocessing.Pool(4)
 scores = pool.map(GetDistrictScores, list(params))
 
-pickle.dump(scores, open('res_fig_scores.pickle', 'wb'))
-scores = pickle.load(open('res_fig_scores.pickle', 'rb'))
+pickle.dump(scores, open('output/res_fig_scores.pickle', 'wb'))
+scores = pickle.load(open('output/res_fig_scores.pickle', 'rb'))
 
 #Melt data frame into the tidy format, suitable for plotting with ggplot
 df = pd.DataFrame(scores)
 df = pd.melt(df, id_vars=['id', 'proj', 'ptype', 'ptopo', 'tol'])
 
 #Save results
-df.to_csv('out_fix.csv', index=False)
+df.to_csv('output/out_fix.csv', index=False)
 
 #Analysis continues in `make_figs.R`

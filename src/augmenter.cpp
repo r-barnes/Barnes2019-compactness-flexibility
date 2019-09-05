@@ -14,11 +14,11 @@ int main(int argc, char **argv) {
   std::string out_filename    = argv[3];
   std::string join_on         = argv[4];
 
-  std::cout<<"Processing '"<<in_sub_filename<<"'..."<<std::endl;
-
+  std::cout<<"Processing '"<<in_sub_filename<<"' and '"<<in_sup_filename<<"'..."<<std::endl;
   auto gc_sub = complib::ReadShapefile(in_sub_filename);
   auto gc_sup = complib::ReadShapefile(in_sup_filename);
 
+  std::cout<<"Clipperifying..."<<std::endl;
   gc_sub.clipperify();
   gc_sup.clipperify();
 

@@ -91,4 +91,4 @@ df = pd.DataFrame(data)
 df = pd.melt(df, id_vars=['id', 'proj', 'ptype'])
 
 #Save results
-df.to_csv('out_projections.csv', index=False)
+df.to_csv('output/out_projections.csv', index=False)
