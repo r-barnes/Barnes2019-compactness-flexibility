@@ -23,5 +23,5 @@ install(
 install(
   FILES res_bounded.py res_fig_gerrymandering.py res_projections.py res_simp_indiv.py res_simp_together.py make_figs.R
   DESTINATION ${CMAKE_SOURCE_DIR}/bin
-  PERMISSIONS OWNER_EXECUTE
+  PERMISSIONS OWNER_READ OWNER_EXECUTE
 )
