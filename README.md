@@ -1,5 +1,5 @@
-Barnes2018-compactness-implementation
-=====================================
+Software for "Gerrymandering and Compactness: Implementation Flexibility and Abuse"
+===================================================================================
 
 **Title of Manuscript**:
 Gerrymandering and Compactness: Implementation Flexibility and Abuse
@@ -11,7 +11,7 @@ Gerrymandering and Compactness: Implementation Flexibility and Abuse
 **DOI Number of Manuscript**: TODO
 
 **Code Repositories**
- * [Author's GitHub Repository](https://github.com/r-barnes/Barnes2018-compactness-implementation)
+ * [Author's GitHub Repository](https://github.com/r-barnes/Barnes2019-compactness-flexibility)
 
 This repository contains the code needed to produce the figures and data
 described in the manuscript above.
@@ -37,6 +37,33 @@ compactness as a legislative or judicial standard to counteract unfair
 redistricting practices. This paper accompanies the release of packages in C++,
 Python, and R which correctly, efficiently, and reproducibly calculate a variety
 of compactness scores.
+
+
+
+To Generate Figures
+-------------------
+
+Clone the repo:
+
+    git clone https://github.com/gerrymandr/python-mander.git
+
+Check out the submodules:
+
+    git submodule update --init --recursive
+
+Install dependencies (TODO)
+
+dbfdump
+import sys
+import shapely
+import shapely.ops
+import shapely.geometry
+import functools
+import fiona
+import json
+import mander
+import pyproj
+import pandas as pd
 
 
 
