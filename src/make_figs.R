@@ -1,16 +1,16 @@
 #!/usr/bin/env R
 
-library(ggplot2)
+library(corrplot)
 library(dplyr)
+library(GGally)
+library(ggplot2)
+library(ggrepel)
+library(gridExtra)
 library(reshape2)
+library(scales)
 library(sf)
 library(stringr)
-library(gridExtra)
-library(scales)
-library(GGally)
-# library(mandeR)
 library(xtable)
-library(ggrepel)
 
 
 fips   <- list("01"="Alabama", "02"="Alaska", "04"="Arizona", "05"="Arkansas", "06"="California", "08"="Colorado", "09"="Connecticut", "10"="Delaware", "11"="District of Columbia", "12"="Florida", "13"="Georgia", "15"="Hawaii", "16"="Idaho", "17"="Illinois", "18"="Indiana", "19"="Iowa", "20"="Kansas", "21"="Kentucky", "22"="Louisiana", "23"="Maine", "24"="Maryland", "25"="Massachusetts", "26"="Michigan", "27"="Minnesota", "28"="Mississippi", "29"="Missouri", "30"="Montana", "31"="Nebraska", "32"="Nevada", "33"="New Hampshire", "34"="New Jersey", "35"="New Mexico", "36"="New York", "37"="North Carolina", "38"="North Dakota", "39"="Ohio", "40"="Oklahoma", "41"="Oregon", "42"="Pennsylvania", "44"="Rhode Island", "45"="South Carolina", "46"="South Dakota", "47"="Tennessee", "48"="Texas", "49"="Utah", "50"="Vermont", "51"="Virginia", "53"="Washington", "54"="West Virginia", "55"="Wisconsin", "56"="Wyoming", "60"="American Samoa", "66"="Guam", "69"="Commonwealth of the Northern Mariana Islands", "72"="Puerto Rico", "78"="U.S. Virgin Islands")
@@ -223,7 +223,7 @@ if(!file.exists('imgs/fig_projections.pdf')){
 ################################################################################
 ################################################################################
 
-if(!file.exists('imgs/effect_of_topography.pdf')){
+if(!file.exists('imgs/fig_effect_of_topography.pdf')){
   df <- read.table('output/effect_of_topography.tbl', header=TRUE, colClasses=c("character","double","double","double","double"))
   df <- df %>% mutate(SAfromTopo=ifelse(SAfromTopo==0,1,SAfromTopo))
   df <- df %>% filter(SAwoTopo>0) %>% filter(SAwTopo>0)
@@ -241,7 +241,7 @@ if(!file.exists('imgs/effect_of_topography.pdf')){
        ylab("Incidence")+
        xlab("Difference in Score")
 
-  ggsave('fig_effect_of_topography.pdf', plot=p, width=2, height=2, limitsize=FALSE)
+  ggsave('imgs/fig_effect_of_topography.pdf', plot=p, width=2, height=2, limitsize=FALSE)
 }
 
 # if(!file.exists('tl_diff_map.pdf')){
@@ -269,7 +269,7 @@ if(!file.exists('imgs/effect_of_topography.pdf')){
 ################################################################################
 
 if(!file.exists('imgs/fig_effect_of_borders.pdf')){
-  df       <- read.table('output/scores.csv', header=TRUE) #TODO
+  df       <- read.table('output/scores500.csv', header=TRUE) #TODO
   df$GEOID <- make_geoids_char(df$GEOID)
 
   diffs <- df %>% group_by(substr(GEOID,1,2)) %>% filter(n()>1)   %>% ungroup() %>%
@@ -286,7 +286,7 @@ if(!file.exists('imgs/fig_effect_of_borders.pdf')){
     ylab("Difference in Score")+
     xlab("")
 
-  ggsave('output/fig_effect_of_borders.pdf', plot=p, width=2, height=2, limitsize=FALSE)
+  ggsave('imgs/fig_effect_of_borders.pdf', plot=p, width=2, height=2, limitsize=FALSE)
 }
 
 
@@ -295,7 +295,7 @@ if(!file.exists('imgs/fig_effect_of_borders.pdf')){
 
 
 if(!file.exists('imgs/fig_effect_of_definitions.pdf')){
-  df       <- read.table('output/scores.csv', header=TRUE) #TODO
+  df       <- read.table('output/scores500.csv', header=TRUE) #TODO
   df$GEOID <- make_geoids_char(df$GEOID)
 
   diffs <- df %>% group_by(substr(GEOID,1,2)) %>% filter(n()>1)  %>% ungroup() %>%
@@ -321,7 +321,7 @@ if(!file.exists('imgs/fig_effect_of_definitions.pdf')){
 ################################################################################
 
 #Electoral districts per state
-df       <- read.table('output/scores.csv', header=TRUE) #TODO
+df       <- read.table('output/scores500.csv', header=TRUE) #TODO
 df$GEOID <- make_geoids_char(df$GEOID)
 df$STATEFP <- as.factor(df$STATEFP)
 
@@ -341,7 +341,7 @@ df2 <- df %>% select(STATEFP)      %>%
 #Misaligned borders
 
 if(!file.exists('imgs/fig_effect_of_misalignment.pdf')){
-  df       <- read.table('output/scores.csv', header=TRUE) #TODO
+  df       <- read.table('output/scores500.csv', header=TRUE) #TODO
   df$GEOID <- make_geoids_char(df$GEOID)
   df$STATEFP <- as.factor(df$STATEFP)
 
@@ -370,7 +370,7 @@ if(!file.exists('imgs/fig_effect_of_misalignment.pdf')){
 
 
 if(!file.exists('imgs/fig_score_order.pdf')){
-  df         <- read.table('scores500.csv', header=TRUE) #TODO
+  df         <- read.table('output/scores500.csv', header=TRUE) #TODO
   df$GEOID   <- make_geoids_char(df$GEOID)
   df$STATEFP <- as.factor(df$STATEFP)
   df2        <- df %>% group_by(substr(GEOID,1,2))                   %>% 
@@ -401,7 +401,7 @@ if(!file.exists('imgs/fig_score_order.pdf')){
 
 
 if(!file.exists('imgs/fig_score_order_corr.pdf')){
-  df         <- read.table('scores500.csv', header=TRUE) #TODO
+  df         <- read.table('output/scores500.csv', header=TRUE) #TODO
   df$GEOID   <- make_geoids_char(df$GEOID)
   df$STATEFP <- as.factor(df$STATEFP)
   df         <- df %>% select(CvxHullPS, CvxHullPT,CvxHullPTB,PolsbyPopp,   ReockPS,   ReockPT,  ReockPTB,Schwartzbe)
@@ -428,7 +428,7 @@ if(!file.exists('imgs/fig_score_order_corr.pdf')){
 #ls *pp | xargs sed -i 's/double/float/g'
 #diff -y --suppress-common-lines scored scored_float | grep = | sed 's/\ (Real)//g' | sed 's/= /,/g'  | sed 's/|/,/'  | d.reducespace > ~/projects/compactness/data-handling/figures/scores_double_vs_float
 
-a           <- read.table('scores_double_vs_float',sep=',')
+a           <- read.table('output/scores_double_vs_float',sep=',')
 colnames(a) <- c('score','dval','score2','fval')
 
 a <- a %>% select(-score2)
@@ -450,19 +450,21 @@ a %>% group_by(score) %>% summarise(max(pdiff))
 
 if(!file.exists('imgs/fig_koch_1.pdf')){
 
-  a <- read.csv('output/koch.csv', colClasses=c("integer", "character"))
-  a <- a %>% mutate(geomo=st_as_sfc(geom))
-  a <- a %>% filter(level>0) %>% filter(level<=8)
-  a <- cbind(a, a %>% rowwise() %>% do(mandeR::getScoresForWKT(.$geom)))
+  a <- read.csv('output/koch_scores.csv', header=TRUE)
+  a <- a %>% mutate(geomo=st_as_sfc(geom), level=as.integer(level))
 
+  print(a$level)
 
   #ls *koch* | xargs -n 1 -I {} pdfcrop {} {}
   for(i in 1:9){
+    print(paste("Doing level",i))
     b <- a %>% filter(level==i)
 
     p<- ggplot(b) + geom_sf(aes(geometry=geomo)) + 
                 theme_void() +
                 theme(
+                  panel.grid.major = element_line(colour = "white"),
+                  panel.grid.minor = element_line(colour = "white"),
                   axis.title.x     = element_blank(),
                   axis.text.x      = element_blank(),
                   axis.ticks.x     = element_blank(),
@@ -484,7 +486,6 @@ if(!file.exists('imgs/fig_koch_1.pdf')){
 
   txt <- t(txt)
   print(xtable(txt), sanitize.text.function = identity, floating.environment = 'figure*', include.colnames=FALSE)
-
 }
 
 
