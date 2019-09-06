@@ -35,6 +35,7 @@ all:
 	R --no-save < bin/make_figs.R
 	#Crop figures
 	ls imgs/*koch*pdf | xargs -n 1 -I {} pdfcrop {} {}
+	ls imgs/fig_evil*pdf | xargs -n 1 -I {} pdfcrop {} {}
 
 
 #districtplot.py
