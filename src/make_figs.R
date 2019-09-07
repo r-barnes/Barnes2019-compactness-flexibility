@@ -99,15 +99,13 @@ if(!file.exists('imgs/fig_simplify_together_summary.pdf')){
                 mutate(sdiff=value-first(value)) %>% 
                 filter(res!="500k") %>% 
                 ungroup()  %>%
-                filter(abs(sdiff)>0.01)
+                filter(abs(sdiff)>0.01) %>%
+                mutate(variable=ifelse(variable=="perimSH","perim",variable)) %>%
+                mutate(variable=ifelse(variable=="areaAH","area",variable))
   df2 <- df2 %>% filter(!(variable=="perim" & sdiff>0)) #Should filter one entry
-
-
 
   #df2 <- df2 %>% mutate(variable=replace(variable, variable=="area", "log(area)")) %>%
   #               mutate(variable=replace(variable, variable=="perim", "log(perim)"))
-
-
 
   MakePlot <- function(var){
     df3 <- df2 %>% filter(variable==var)
@@ -355,7 +353,7 @@ if(!file.exists('imgs/fig_effect_of_misalignment.pdf')){
     #geom_boxplot()+
     # geom_jitter()+
     # geom_violin()+
-    geom_histogram()+
+    geom_histogram(binwidth=0.5)+
     # theme(axis.text.x=element_blank(), axis.ticks.x=element_blank())+
     xlab("% Uncertainty in Area")+
     ylab("Incidence")
@@ -603,7 +601,7 @@ FindEvil <- function(a, fixid){
 
 
 inp <- read.csv('output/out_fix.csv', colClasses=c('character','character','character','character','factor','character', 'double'))
-a   <- inp %>% filter(proj!='input') %>% filter(!(variable %in% c('perimSH', 'areaSH', 'areaAH', 'HoleCount')))
+a   <- inp %>% filter(proj!='input') %>% filter(!(variable %in% c('perimSH', 'areaSH', 'areaAH', 'HoleCount', 'AreaUncert', 'PolyCount')))
 #a   <- a %>% filter(variable!='CvxHullPTB')
 
 a$proj = gsub('local_lcc','Local LCC',a$proj)
