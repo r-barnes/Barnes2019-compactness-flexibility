@@ -1,4 +1,4 @@
-#include "compactnesslib/compactnesslib.hpp"
+#include <compactnesslib/compactnesslib.hpp>
 #include "Timer.hpp"
 #include <iostream>
 #include <fstream>
@@ -18,7 +18,6 @@ int main(int argc, char **argv) {
   auto gc_sub = complib::ReadShapefile(in_sub_filename);
   auto gc_sup = complib::ReadShapefile(in_sup_filename);
 
-  std::cout<<"Clipperifying..."<<std::endl;
   gc_sub.clipperify();
   gc_sup.clipperify();
 
