@@ -69,3 +69,7 @@ Run everything by typing:
     make
 
 Make will create a folder to run cmake in and then execute all the commands needed to generate the figures. It may take quite a while.
+
+`scores_double_vs_float` is presupplied because its effect size is small and generating it takes significant manual work. To generate it, replace `double` with `float` throughout `submodules/compactnesslib/api` and `submodules/compactnesslib/src` and rerun all score generation, per the makefile.
+
+`effect_of_topography.tbl` is presupplied because its effect size is small and generating it takes significant manual work. To generate it, acquire NED 10m elevation data for the US (several gigabytes), cut the elevation data to the boundary of each congressional district using `gdal`, and then measure the length of the outline with and without topography using RichDEM.
