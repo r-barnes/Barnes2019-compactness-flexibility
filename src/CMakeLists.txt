@@ -15,13 +15,13 @@ install(
 )
 
 install(
-  FILES common.py districtplot.py
+  FILES common.py 
   DESTINATION ${CMAKE_SOURCE_DIR}/bin
   PERMISSIONS OWNER_READ
 )
 
 install(
-  FILES res_bounded.py res_fig_gerrymandering.py res_projections.py res_simp_indiv.py res_simp_together.py make_figs.R koch_scores.py
+  FILES res_bounded.py res_fig_gerrymandering.py res_projections.py res_simp_indiv.py res_simp_together.py make_figs.R koch_scores.py districtplot.py
   DESTINATION ${CMAKE_SOURCE_DIR}/bin
   PERMISSIONS OWNER_READ OWNER_EXECUTE
 )

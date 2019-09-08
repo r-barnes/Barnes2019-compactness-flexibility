@@ -1,20 +1,19 @@
 #!/usr/bin/env python3
 
-import sys
-import shapely
-import shapely.ops
-import shapely.geometry
-import functools
 import fiona
+import functools
 import json
 import mander
-import pyproj
-import pandas as pd
-import re
 import os.path
+import pandas as pd
 import pickle
+import pyproj
+import re
+import shapely
+import shapely.geometry
+import shapely.ops
+import sys
 
-import districtplot
 import common
 
 #Utility function for reprojecting a shape
@@ -85,56 +84,3 @@ if not (os.path.exists('out_simplify_together.pickle') and os.path.exists('out_s
   df.to_csv('output/out_simplify_together.csv', index=False)
 
   pickle.dump(data, open('output/out_simplify_together.pickle', 'wb'))
-
-data = pickle.load(open('output/out_simplify_together.pickle', 'rb'))
-
-if sys.argv[1][0:2]=="-p":
-  print("Building images...")
-  order = {'500k':1,'5m':2,'20m':3}
-  ids   = set([x['id'] for x in data])
-  for tp in ids:
-    if os.path.exists('res_book/img_st_{0}_0.png'.format(tp)) and os.path.exists('res_book/img_st_{0}_1.png'.format(tp)) and os.path.exists('res_book/img_st_{0}_2.png'.format(tp)):
-      continue
-    print(tp)
-    dists_to_plot = sorted([x for x in data if x['id'] == tp], key=lambda x: order[x['res']])
-    districtplot.PlotDistricts(dists_to_plot, 'res_book/img_st_{0}_{{i}}.png'.format(tp))
-
-  entry = """
-  \\begin{{minipage}}{{\columnwidth}}
-  \\begin{{tabular}}{{ccc}}
-  \\includegraphics[width=2cm]{{img_st_{fname}_0.png}} &
-  \\includegraphics[width=2cm]{{img_st_{fname}_1.png}} &
-  \\includegraphics[width=2cm]{{img_st_{fname}_2.png}} \\\\
-  \\pscore{{{pscore0}}} & \pscore{{{pscore1}}} & \pscore{{{pscore2}}} \\\\
-  \\cscore{{{cscore0}}} & \cscore{{{cscore1}}} & \cscore{{{cscore2}}}
-  \\end{{tabular}}
-  \\imtitle{{{dname}}}
-  \\end{{minipage}}
-  """
-
-  print("Printing book...")
-  fout = open('res_book/entries.tex', 'w')
-  ids = list(set([x['id'] for x in data]))
-  ids.sort()
-  oldname = None
-  for tp in ids:
-    print(tp)
-    dists_to_plot = sorted([x for x in data if x['id'] == tp], key=lambda x: order[x['res']])
-    if len(dists_to_plot)<3:
-      continue
-    if oldname!=dists_to_plot[0]['name'][0:5]:
-      this_name = dists_to_plot[0]['name']
-      oldname   = this_name[0:5]
-      fout.write('\\bchap{{{0}}}'.format(this_name[0:this_name.find('#')-1]))
-    fout.write(entry.format(
-      fname   = tp,
-      dname   = dists_to_plot[0]['name'].replace('#',''),
-      pscore0 = dists_to_plot[0]['PolsbyPopp'],
-      pscore1 = dists_to_plot[1]['PolsbyPopp'],
-      pscore2 = dists_to_plot[2]['PolsbyPopp'],
-      cscore0 = dists_to_plot[0]['ConvexHull'],
-      cscore1 = dists_to_plot[1]['ConvexHull'],
-      cscore2 = dists_to_plot[2]['ConvexHull']
-    ))
-  fout.close()
-  del fout
