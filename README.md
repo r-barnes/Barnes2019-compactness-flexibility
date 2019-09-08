@@ -51,55 +51,21 @@ Check out the submodules:
 
     git submodule update --init --recursive
 
-Install dependencies (TODO)
+Install bash dependencies:
 
-dbfdump
-import sys
-import shapely
-import shapely.ops
-import shapely.geometry
-import functools
-import fiona
-import json
-import mander
-import pyproj
-import pandas as pd
+    sudo apt install shapelib shapetools gdal-bin r-base make cmake
 
+Install Python dependencies:
 
+    pip3 install -r requirements.txt
 
-Dependencies
-------------
+Install R dependencies:
 
-You will need [python-mander](https://pypi.python.org/pypi/mander/0.3) to run
-the code.
+    R
+    install.packages(c("corrplot", "dplyr", "GGally", "ggplot2", "ggrepel", "gridExtra", "reshape2", "scales", "sf", "stringr", "xtable"))
 
-Install it using:
+Run everything by typing:
 
-    pip3 install mander
+    make
 
-You will also need **R** and **gdal** installed.
-
-
-
-Data
------------
-
-You will need the following data files, or equivalent, from the U.S. Census
-Bureau:
-
- * `cb_2015_us_cd114_20m.shp`
- * `cb_2015_us_cd114_500k.shp`
- * `cb_2015_us_cd114_5m.shp`
- * `cb_2015_us_state_20m.shp`
- * `cb_2015_us_state_500k.shp`
- * `cb_2015_us_state_5m.shp`
- * `tl_2015_us_cd114.shp`
-
-
-
-Usage
------------
-
-To generate figures, use the command:
-
-    ./RUN.sh
+Make will create a folder to run cmake in and then execute all the commands needed to generate the figures. It may take quite a while.
