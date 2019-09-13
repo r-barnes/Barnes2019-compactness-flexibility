@@ -58,7 +58,7 @@ def PlotDistrictsWithID(district_id):
   districts_with_id = [x for x in data if x['id'] == district_id]
   dims = GetDimensions(districts_with_id)
   for district in districts_with_id:
-    filename = 'imgs/district_{id}_{res}.png'.format(id=district_id, res=district['res'])
+    filename = 'output/district_{id}_{res}.png'.format(id=district_id, res=district['res'])
     print("Plotting {0} at resolution {1} to '{2}'".format(district_id, district['res'], filename))
     if os.path.exists(filename):
       continue

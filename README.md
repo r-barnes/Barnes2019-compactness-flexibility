@@ -43,17 +43,13 @@ of compactness scores.
 To Generate Figures
 -------------------
 
-Clone the repo:
+### Install Dependencies
 
-    git clone https://github.com/gerrymandr/python-mander.git
-
-Check out the submodules:
-
-    git submodule update --init --recursive
+Figures are known to generate correctly with Python 3.6.8 and R version 3.4.4
 
 Install bash dependencies:
 
-    sudo apt install shapelib shapetools gdal-bin r-base make cmake
+    sudo apt install shapelib shapetools gdal-bin r-base make cmake python3
 
 Install Python dependencies:
 
@@ -64,11 +60,41 @@ Install R dependencies:
     R
     install.packages(c("corrplot", "dplyr", "GGally", "ggplot2", "ggrepel", "gridExtra", "reshape2", "scales", "sf", "stringr", "xtable"))
 
-Run everything by typing:
+The following R package versions were used to generate the figures in the paper.
+
+    corrplot     0.84
+    dplyr     0.8.0.1
+    GGally      1.4.0
+    ggplot2     3.1.0
+    ggrepel     0.8.1
+    gridExtra     2.3
+    reshape2    1.4.3
+    scales      1.0.0
+    sf          0.7-7
+    stringr     1.4.0
+    xtable      1.8-3
+
+### Via Github
+
+In addition to the above, if you have obtained this code from Github, you must ensure you have acquired the code's submodules.
+
+Clone the repo:
+
+    git clone https://github.com/gerrymandr/python-mander.git
+
+Check out the submodules:
+
+    git submodule update --init --recursive
+
+### Build Figures
+
+Figures are known to generate without problems on a 2011 Thinkpad X201 with a Intel(R) Core(TM) i5 M480@2.67GHz CPU with 4 cores and 8GB of RAM.
+
+All of the figures are built by running a single command:
 
     make
 
-Make will create a folder to run cmake in and then execute all the commands needed to generate the figures. It may take quite a while.
+Make will create a folder to run `cmake` in and then execute all the commands needed to generate the figures. The final figures will be saved to a folder named `figures/`. It may take quite a while.
 
 `scores_double_vs_float` is presupplied because its effect size is small and generating it takes significant manual work. To generate it, replace `double` with `float` throughout `submodules/compactnesslib/api` and `submodules/compactnesslib/src` and rerun all score generation, per the makefile.
 

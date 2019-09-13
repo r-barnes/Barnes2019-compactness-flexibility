@@ -35,5 +35,5 @@ all:
 	#Generate district images
 	./bin/districtplot.py 1205 1704 2103 2103 2103 2201 2201 2201 2402 2403 3701 3704 3712 4207 4833 4835
 	#Crop figures
-	ls imgs/*koch*pdf | xargs -n 1 -I {} pdfcrop {} {}
-	ls imgs/fig_evil*pdf | xargs -n 1 -I {} pdfcrop {} {}
+	ls output/*koch*pdf | xargs -n 1 -I {} pdfcrop {} {}
+	ls output/fig_evil*pdf | xargs -n 1 -I {} pdfcrop {} {}
