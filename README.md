@@ -11,7 +11,7 @@ Gerrymandering and Compactness: Implementation Flexibility and Abuse
 **DOI Number of Manuscript**: TODO
 
 **Code Repositories**
- * [Author's GitHub Repository](https://github.com/r-barnes/Barnes2019-compactness-flexibility)
+ * [GitHub Repository](https://github.com/r-barnes/Barnes2019-compactness-flexibility)
 
 This repository contains the code needed to produce the figures and data
 described in the manuscript above.
