@@ -27,13 +27,17 @@ all:
 	./bin/res_simp_indiv.py         data/cb_2015_us_cd114_500k.shp
 	./bin/res_fig_gerrymandering.py data/cb_2015_us_cd114_500k.shp data/cb_2015_us_state_500k.shp
 	#Extract the score data
-	dbfdump output/cb_2015_us_cd114_500k_scored.shp  > output/scores500.csv
-	dbfdump data/cb_2015_us_cd114_20m_scored.shp   > output/scores20.csv #TODO: CUt
-	dbfdump data/cb_2015_us_cd114_5m_scored.shp    > output/scores5.csv #TODO: CUT
+	-dbfdump output/cb_2015_us_cd114_500k_scored.shp  > output/scores500.csv
+	-dbfdump data/cb_2015_us_cd114_20m_scored.shp   > output/scores20.csv #TODO: CUt
+	-dbfdump data/cb_2015_us_cd114_5m_scored.shp    > output/scores5.csv #TODO: CUT
 	#Generate the figures
-	R --no-save < bin/make_figs.R
+	R --no-save < bin/make_figs.R > output/temp_table
+	cat output/temp_table  | grep -E "tabular|&" | grep -v cat | grep -vE "^\+" > tables/table1.tex
 	#Generate district images
 	./bin/districtplot.py 1205 1704 2103 2103 2103 2201 2201 2201 2402 2403 3701 3704 3712 4207 4833 4835
 	#Crop figures
 	ls output/*koch*pdf | xargs -n 1 -I {} pdfcrop {} {}
 	ls output/fig_evil*pdf | xargs -n 1 -I {} pdfcrop {} {}
+	#Generate figures
+	cp output/figure* figures/
+	ls tex/* | xargs -n 1 pdflatex -output-directory figures

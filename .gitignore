@@ -9,3 +9,6 @@ build/
 bin/
 output/
 *.egg-info
+*.aux
+*.log
+tables/

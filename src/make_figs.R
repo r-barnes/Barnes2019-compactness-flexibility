@@ -59,7 +59,7 @@ if(!file.exists('output/fig_simplify_individually_poster.png')){
   ggsave('output/fig_simplify_individually_poster.png', plot=p, height=10, width=30, limitsize=FALSE)
 }
 
-if(!file.exists('output/fig_simplify_individually_summary.pdf')){
+if(!file.exists('output/figure13_simplify_individually_summary.pdf')){
   #df <- df %>% filter(!(variable %in% c('area','perim')))
 
   df2 <- df %>% filter(variable %in% c("CvxHullPS", "PolsbyPopp", "ReockPS"))
@@ -72,7 +72,7 @@ if(!file.exists('output/fig_simplify_individually_summary.pdf')){
     xlab("Tolerance (m)") +
     ylab("Value")
 
-  ggsave('output/fig_simplify_individually_summary.pdf', plot=p, height=4, width=4, limitsize=FALSE)
+  ggsave('output/figure13_simplify_individually_summary.pdf', plot=p, height=4, width=4, limitsize=FALSE)
 }
 
 
@@ -80,7 +80,7 @@ if(!file.exists('output/fig_simplify_individually_summary.pdf')){
 ################################################################################
 
 
-if(!file.exists('output/fig_simplify_together_summary.pdf')){
+if(!file.exists('output/figure12_simplify_together_summary.pdf')){
   #df <- df %>% filter(!(variable %in% c('area','perim')))
 
   df <- read.csv('output/out_simplify_together.csv', colClasses=c("character","character","character","character","double"))
@@ -126,7 +126,7 @@ if(!file.exists('output/fig_simplify_together_summary.pdf')){
     ncol=1
   )
 
-  ggsave('output/fig_simplify_together_summary.pdf', plot=p, height=6, width=4, limitsize=FALSE)
+  ggsave('output/figure12_simplify_together_summary.pdf', plot=p, height=6, width=4, limitsize=FALSE)
 }
 
 
@@ -155,7 +155,7 @@ if(!file.exists('output/fig_simplify_together_summary.pdf')){
 
 
 
-if(!file.exists('output/fig_projections.pdf')){
+if(!file.exists('output/figure9_projections.pdf')){
   df <- read.csv('output/out_projections.csv', colClasses=c("character","character","character","character","double"))
   df <- df %>% filter(variable %in% c('CvxHullPS', 'CvxHullPT', 'PolsbyPopp', 'ReockPS', 'ReockPT', 'Schwartzbe'))
   df <- df %>% filter(proj!='input')
@@ -210,7 +210,7 @@ if(!file.exists('output/fig_projections.pdf')){
     ylab("Range Under Reprojection")+
     theme(axis.text.x = element_text(angle = 45, hjust = 1, size=9))
 
-  ggsave('output/fig_projections.pdf', plot=p, width=4, height=4, limitsize=FALSE)
+  ggsave('output/figure9_projections.pdf', plot=p, width=4, height=4, limitsize=FALSE)
 
   df %>% group_by(ptype,variable) %>% summarise(median=median(value), quant=quantile(value, probs=c(0.99)))
 }
@@ -221,7 +221,7 @@ if(!file.exists('output/fig_projections.pdf')){
 ################################################################################
 ################################################################################
 
-if(!file.exists('output/fig_effect_of_topography.pdf')){
+if(!file.exists('output/figure10_effect_of_topography.pdf')){
   df <- read.table('output/effect_of_topography.tbl', header=TRUE, colClasses=c("character","double","double","double","double"))
   df <- df %>% mutate(SAfromTopo=ifelse(SAfromTopo==0,1,SAfromTopo))
   df <- df %>% filter(SAwoTopo>0) %>% filter(SAwTopo>0)
@@ -239,7 +239,7 @@ if(!file.exists('output/fig_effect_of_topography.pdf')){
        ylab("Incidence")+
        xlab("Difference in Score")
 
-  ggsave('output/fig_effect_of_topography.pdf', plot=p, width=2, height=2, limitsize=FALSE)
+  ggsave('output/figure10_effect_of_topography.pdf', plot=p, width=2, height=2, limitsize=FALSE)
 }
 
 # if(!file.exists('tl_diff_map.pdf')){
@@ -266,7 +266,7 @@ if(!file.exists('output/fig_effect_of_topography.pdf')){
 ################################################################################
 ################################################################################
 
-if(!file.exists('output/fig_effect_of_borders.pdf')){
+if(!file.exists('output/figure5_effect_of_borders.pdf')){
   df       <- read.table('output/scores500.csv', header=TRUE) #TODO
   df$GEOID <- make_geoids_char(df$GEOID)
 
@@ -284,7 +284,7 @@ if(!file.exists('output/fig_effect_of_borders.pdf')){
     ylab("Difference in Score")+
     xlab("")
 
-  ggsave('output/fig_effect_of_borders.pdf', plot=p, width=2, height=2, limitsize=FALSE)
+  ggsave('output/figure5_effect_of_borders.pdf', plot=p, width=2, height=2, limitsize=FALSE)
 }
 
 
@@ -292,7 +292,7 @@ if(!file.exists('output/fig_effect_of_borders.pdf')){
 ################################################################################
 
 
-if(!file.exists('output/fig_effect_of_definitions.pdf')){
+if(!file.exists('output/figure3_effect_of_definitions.pdf')){
   df       <- read.table('output/scores500.csv', header=TRUE) #TODO
   df$GEOID <- make_geoids_char(df$GEOID)
 
@@ -310,7 +310,7 @@ if(!file.exists('output/fig_effect_of_definitions.pdf')){
     ylab("Difference in Score")+
     xlab("")
 
-  ggsave('output/fig_effect_of_definitions.pdf', plot=p, width=2, height=2, limitsize=FALSE)
+  ggsave('output/figure3_effect_of_definitions.pdf', plot=p, width=2, height=2, limitsize=FALSE)
 }
 
 
@@ -338,7 +338,7 @@ df2 <- df %>% select(STATEFP)      %>%
 
 #Misaligned borders
 
-if(!file.exists('output/fig_effect_of_misalignment.pdf')){
+if(!file.exists('output/figure8_effect_of_misalignment.pdf')){
   df       <- read.table('output/scores500.csv', header=TRUE) #TODO
   df$GEOID <- make_geoids_char(df$GEOID)
   df$STATEFP <- as.factor(df$STATEFP)
@@ -359,7 +359,7 @@ if(!file.exists('output/fig_effect_of_misalignment.pdf')){
     ylab("Incidence")
 
 
-  ggsave('output/fig_effect_of_misalignment.pdf', plot=p, width=2, height=2, limitsize=FALSE)
+  ggsave('output/figure8_effect_of_misalignment.pdf', plot=p, width=2, height=2, limitsize=FALSE)
 }
 
 
@@ -367,7 +367,7 @@ if(!file.exists('output/fig_effect_of_misalignment.pdf')){
 
 
 
-if(!file.exists('output/fig_score_order.pdf')){
+if(!file.exists('output/figure15_score_order.pdf')){
   df         <- read.table('output/scores500.csv', header=TRUE) #TODO
   df$GEOID   <- make_geoids_char(df$GEOID)
   df$STATEFP <- as.factor(df$STATEFP)
@@ -392,13 +392,13 @@ if(!file.exists('output/fig_score_order.pdf')){
                  scale_y_continuous(name="CvxHullPT Score", sec.axis = sec_axis(~.*1, name = "CvxHullPS Score"))+
                  theme(axis.title.y = element_text(size=15))
 
-  ggsave('output/fig_score_order.pdf', plot=p, width=4, height=4, limitsize=FALSE)
+  ggsave('output/figure15_score_order.pdf', plot=p, width=4, height=4, limitsize=FALSE)
 }
 
 
 
 
-if(!file.exists('output/fig_score_order_corr.pdf')){
+if(!file.exists('output/figure16_score_order_corr.pdf')){
   df         <- read.table('output/scores500.csv', header=TRUE) #TODO
   df$GEOID   <- make_geoids_char(df$GEOID)
   df$STATEFP <- as.factor(df$STATEFP)
@@ -406,7 +406,7 @@ if(!file.exists('output/fig_score_order_corr.pdf')){
 
   cm <- cor(df, method="spearman")
   
-  pdf('output/fig_score_order_corr.pdf', width=7, height=7)
+  pdf('output/figure16_score_order_corr.pdf', width=7, height=7)
   corrplot(cm, p.mat=cm, type='lower', method="circle", order="FPC", tl.pos="d", cl.lim=c(0.4,1), insig="p-value", pch.col="black", tl.col="black", col=colorRampPalette(c('red','red','red','red','red','red','red','#d7191c','#fdae61','#ffffbf','#abd9e9','#2c7bb6'))(11))
   dev.off()
 }

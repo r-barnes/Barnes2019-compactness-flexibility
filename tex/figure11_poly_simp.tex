@@ -1,0 +1,35 @@
+\documentclass{standalone}
+
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{siunitx}
+
+\newcommand{\pscore}[1]{\score{PP}{#1}}
+\newcommand{\cscore}[1]{\score{CH}{#1}}
+
+\sisetup{round-mode = places}% in preamble    
+
+\newcommand{\score}[2]{
+\begin{tikzpicture}
+\draw (0,0)--(1,0);
+\filldraw[black] (#2,0) circle (0.05);
+\node at (-0.2,0) {\tiny #1};
+\node at (0.5,-0.2) {\tiny \num[round-precision=2]{#2}};
+\end{tikzpicture}
+}
+
+\begin{document}
+\begin{tabular}{cccccc}
+\raisebox{-.5\height}{\includegraphics[width=2.2cm]{output/district_2103_500k.png}} &
+\raisebox{-.5\height}{\includegraphics[width=2.2cm]{output/district_2103_5m.png}} &
+\raisebox{-.5\height}{\includegraphics[width=2.2cm]{output/district_2103_20m.png}} &
+\raisebox{-.5\height}{\includegraphics[width=2.2cm]{output/district_2201_500k.png}} &
+\raisebox{-.5\height}{\includegraphics[width=2.2cm]{output/district_2201_5m.png}} &
+\raisebox{-.5\height}{\includegraphics[width=2.2cm]{output/district_2201_20m.png}} \\
+     500k         &        5m         &       20m         &      500k         &        5m         &       20m \\
+\pscore{0.379992} & \pscore{0.476327} & \pscore{0.54611}  & \pscore{0.032985} & \pscore{0.0553361} & \pscore{0.150796} \\
+\cscore{0.780833} & \cscore{0.828378} & \cscore{0.789624} & \cscore{0.575963} & \cscore{0.598142}  & \cscore{0.6684} \\
+                  & Kentucky 03       &                   &                   & Louisiana 01       &
+\end{tabular}
+
+\end{document}
