@@ -7,7 +7,11 @@ PRIVATE
   compactnesslib
 )
 
+target_compile_features(augmenter.exe PUBLIC cxx_std_11)
+
 add_executable(koch.exe koch.cpp)
+
+target_compile_features(koch.exe PUBLIC cxx_std_11)
 
 install(
   TARGETS koch.exe augmenter.exe
