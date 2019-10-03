@@ -137,3 +137,17 @@ The repository contains the following files:
  * `src/res_simp_together.py*`: Calculates effect of simplifying district shapes when groups of districts are considered as part of the simplification.
  * `src/Timer.cpp`: Used for timing various operations
  * `src/Timer.hpp`: Used for timing various operations
+
+Build Issues
+============
+
+`error: can't combine user with prefix, exec_prefix/home, or install_(plat)base`
+
+Is a system configuration issue on your machine. Resolve it by editing `Makefile` from:
+```bash
+cd submodules/python-mander && python3 setup.py install --user
+```
+to
+```bash
+cd submodules/python-mander && python3 setup.py install --user --prefix=
+```
