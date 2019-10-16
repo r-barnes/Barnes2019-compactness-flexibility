@@ -49,16 +49,12 @@ Figures are known to generate correctly with Python (v3.6.8), R (v3.4.4), and pd
 
 Install bash dependencies:
 
-    sudo apt install shapelib shapetools gdal-bin r-base make cmake python3
+    sudo apt install make cmake python3
 
-Install Python dependencies:
+Set up and activate environment:
 
-    pip3 install -r requirements.txt
-
-Install R dependencies:
-
-    R
-    install.packages(c("corrplot", "dplyr", "GGally", "ggplot2", "ggrepel", "gridExtra", "reshape2", "scales", "sf", "stringr", "xtable"))
+    conda env create -f environment.yml
+    conda env remove -n barnes2019_gerrymandering
 
 The following R package versions were used to generate the figures in the paper.
 
