@@ -51,14 +51,10 @@ Install bash dependencies:
 
     sudo apt install --no-install-recommends shapelib shapetools gdal-bin r-base make cmake python3 gcc g++ gfortran libudunits2-dev libgdal-dev libpython-dev
 
-Install Python dependencies:
+Set up and activate environment:
 
-    pip3 install -r requirements.txt
-
-Install R dependencies:
-
-    R
-    install.packages(c("corrplot", "dplyr", "GGally", "ggplot2", "ggrepel", "gridExtra", "reshape2", "scales", "sf", "stringr", "xtable"))
+    conda env create -f environment.yml
+    conda env remove -n barnes2019_gerrymandering
 
 The following R package versions were used to generate the figures in the paper.
 
@@ -137,3 +133,17 @@ The repository contains the following files:
  * `src/res_simp_together.py*`: Calculates effect of simplifying district shapes when groups of districts are considered as part of the simplification.
  * `src/Timer.cpp`: Used for timing various operations
  * `src/Timer.hpp`: Used for timing various operations
+
+Build Issues
+============
+
+`error: can't combine user with prefix, exec_prefix/home, or install_(plat)base`
+
+Is a system configuration issue on your machine. Resolve it by editing `Makefile` from:
+```bash
+cd submodules/python-mander && python3 setup.py install --user
+```
+to
+```bash
+cd submodules/python-mander && python3 setup.py install --user --prefix=
+```

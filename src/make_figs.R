@@ -2,9 +2,7 @@
 
 library(corrplot)
 library(dplyr)
-library(GGally)
 library(ggplot2)
-library(ggrepel)
 library(gridExtra)
 library(reshape2)
 library(scales)
@@ -12,6 +10,15 @@ library(sf)
 library(stringr)
 library(xtable)
 
+if(!require(ggrepel)){
+  install.packages("ggrepel", repos = "http://cran.us.r-project.org")
+  library(ggrepel)
+}
+
+if(!require(GGally)){
+  install.packages("GGally", repos = "http://cran.us.r-project.org")
+  library(GGally)
+}
 
 fips   <- list("01"="Alabama", "02"="Alaska", "04"="Arizona", "05"="Arkansas", "06"="California", "08"="Colorado", "09"="Connecticut", "10"="Delaware", "11"="District of Columbia", "12"="Florida", "13"="Georgia", "15"="Hawaii", "16"="Idaho", "17"="Illinois", "18"="Indiana", "19"="Iowa", "20"="Kansas", "21"="Kentucky", "22"="Louisiana", "23"="Maine", "24"="Maryland", "25"="Massachusetts", "26"="Michigan", "27"="Minnesota", "28"="Mississippi", "29"="Missouri", "30"="Montana", "31"="Nebraska", "32"="Nevada", "33"="New Hampshire", "34"="New Jersey", "35"="New Mexico", "36"="New York", "37"="North Carolina", "38"="North Dakota", "39"="Ohio", "40"="Oklahoma", "41"="Oregon", "42"="Pennsylvania", "44"="Rhode Island", "45"="South Carolina", "46"="South Dakota", "47"="Tennessee", "48"="Texas", "49"="Utah", "50"="Vermont", "51"="Virginia", "53"="Washington", "54"="West Virginia", "55"="Wisconsin", "56"="Wyoming", "60"="American Samoa", "66"="Guam", "69"="Commonwealth of the Northern Mariana Islands", "72"="Puerto Rico", "78"="U.S. Virgin Islands")
 fipsab <- list("01"="AL", "02"="AK", "04"="AZ", "05"="AR", "06"="CA", "08"="CO", "09"="CN", "10"="DE", "11"="DC", "12"="FL", "13"="GA", "15"="HI", "16"="ID", "17"="IL", "18"="IN", "19"="IO", "20"="KA", "21"="KY", "22"="LA", "23"="ME", "24"="MD", "25"="MA", "26"="MI", "27"="MN", "28"="MS", "29"="MO", "30"="MT", "31"="NE", "32"="NV", "33"="NH", "34"="NJ", "35"="NM", "36"="NY", "37"="NC", "38"="ND", "39"="OH", "40"="OK", "41"="OR", "42"="PA", "44"="RI", "45"="SC", "46"="SD", "47"="TN", "48"="TX", "49"="UT", "50"="VT", "51"="VA", "53"="WA", "54"="WV", "55"="WI", "56"="WY", "60"="AS", "66"="GU", "69"="MP", "72"="PR", "78"="VI")
@@ -94,10 +101,10 @@ if(!file.exists('output/figure12_simplify_together_summary.pdf')){
   df <- df %>% mutate(variable=replace(variable, variable=="ConvexHull", "CvxHullPT"))
   df <- df %>% mutate(variable=replace(variable, variable=="Reock",      "ReockPT"))
 
-  df2 <- df %>% group_by(id,variable) %>% 
-                arrange(res) %>% 
-                mutate(sdiff=value-first(value)) %>% 
-                filter(res!="500k") %>% 
+  df2 <- df %>% group_by(id,variable) %>%
+                arrange(res) %>%
+                mutate(sdiff=value-first(value)) %>%
+                filter(res!="500k") %>%
                 ungroup()  %>%
                 filter(abs(sdiff)>0.01) %>%
                 mutate(variable=ifelse(variable=="perimSH","perim",variable)) %>%
@@ -113,7 +120,7 @@ if(!file.exists('output/figure12_simplify_together_summary.pdf')){
   }
 
   asinh_trans <- function(){
-    trans_new(name = 'asinh', transform = function(x) asinh(x), 
+    trans_new(name = 'asinh', transform = function(x) asinh(x),
               inverse = function(x) sinh(x))
   }
 
@@ -134,8 +141,8 @@ if(!file.exists('output/figure12_simplify_together_summary.pdf')){
 # #Find scores which changed a bunch between different levels of resolution
 # df2 <- df %>% arrange(res) %>% group_by(id,variable) %>% mutate(value=value-first(value))
 # df2 <- df2 %>% filter(!(variable %in% c('area','perim'))) #Exclude area and perim
-# df2 <- df2 %>% filter(variable %in% c('PolsbyPopp','ConvexHull')) 
-# df2 <- df2 %>% group_by(id,variable) %>% 
+# df2 <- df2 %>% filter(variable %in% c('PolsbyPopp','ConvexHull'))
+# df2 <- df2 %>% group_by(id,variable) %>%
 #         mutate(diff=abs(max(value)-min(value))) %>%
 #         select(id,variable,diff) %>%
 #         arrange(desc(diff)) %>%
@@ -279,7 +286,7 @@ if(!file.exists('output/figure5_effect_of_borders.pdf')){
 
   table(diffs$variable)
 
-  p <- ggplot(diffs, aes(x=variable,y=value)) + 
+  p <- ggplot(diffs, aes(x=variable,y=value)) +
     geom_violin()+
     ylab("Difference in Score")+
     xlab("")
@@ -305,7 +312,7 @@ if(!file.exists('output/figure3_effect_of_definitions.pdf')){
 
   table(diffs$variable)
 
-  p <- ggplot(diffs, aes(x=variable,y=value)) + 
+  p <- ggplot(diffs, aes(x=variable,y=value)) +
     geom_violin()+
     ylab("Difference in Score")+
     xlab("")
@@ -325,7 +332,7 @@ df$STATEFP <- as.factor(df$STATEFP)
 
 print("Histogram of number of districts per state")
 df2 <- df %>% select(STATEFP)      %>%
-              group_by(STATEFP)    %>% 
+              group_by(STATEFP)    %>%
               summarise(count=n()) %>%
               ungroup()            %>%
               group_by(count)      %>%
@@ -344,7 +351,7 @@ if(!file.exists('output/figure8_effect_of_misalignment.pdf')){
   df$STATEFP <- as.factor(df$STATEFP)
 
   df2 <- df %>% group_by(substr(GEOID,1,2)) %>% filter(n()>1)  %>% ungroup() %>%
-                mutate(AreaUncertainty=100*AreaUncert/areaAH) %>% 
+                mutate(AreaUncertainty=100*AreaUncert/areaAH) %>%
                 select(GEOID,areaAH,AreaUncertainty)          %>%
                 filter(areaAH>=1e8)                           %>%
                 arrange(AreaUncertainty)
@@ -371,20 +378,20 @@ if(!file.exists('output/figure15_score_order.pdf')){
   df         <- read.table('output/scores500.csv', header=TRUE) #TODO
   df$GEOID   <- make_geoids_char(df$GEOID)
   df$STATEFP <- as.factor(df$STATEFP)
-  df2        <- df %>% group_by(substr(GEOID,1,2))                   %>% 
-                       filter(n()>1)                                 %>% 
+  df2        <- df %>% group_by(substr(GEOID,1,2))                   %>%
+                       filter(n()>1)                                 %>%
                        ungroup()                                     %>%
                        select(GEOID,CvxHullPS,CvxHullPT)             %>%
                        mutate(cvxdiff=abs(CvxHullPT-CvxHullPS)>1e-4) %>%
                        arrange(CvxHullPT)                            %>%
                        melt(id.vars=c("GEOID", "cvxdiff"))
-  df3 <- df2 %>% filter(cvxdiff>0) 
+  df3 <- df2 %>% filter(cvxdiff>0)
   df2 <- df2 %>% filter(cvxdiff==0)
 
   df3$variable <- factor(df3$variable, levels=c("CvxHullPT", "CvxHullPS"), ordered=TRUE)
   df2$variable <- factor(df2$variable, levels=c("CvxHullPT", "CvxHullPS"), ordered=TRUE)
 
-  p<- ggplot() + 
+  p<- ggplot() +
                  #geom_line(data=df2, aes(x = variable, y = value, group=GEOID), color="black", alpha=0.2,  size=0.25) +
                  geom_line(data=df3, aes(x = variable, y = value, group=GEOID), color="black", alpha=0.5, size=1)   +
                  xlab("") + scale_x_discrete(expand=c(0,0)) +
@@ -405,7 +412,7 @@ if(!file.exists('output/figure16_score_order_corr.pdf')){
   df         <- df %>% select(CvxHullPS, CvxHullPT,CvxHullPTB,PolsbyPopp,   ReockPS,   ReockPT,  ReockPTB,Schwartzbe)
 
   cm <- cor(df, method="spearman")
-  
+
   pdf('output/figure16_score_order_corr.pdf', width=7, height=7)
   corrplot(cm, p.mat=cm, type='lower', method="circle", order="FPC", tl.pos="d", cl.lim=c(0.4,1), insig="p-value", pch.col="black", tl.col="black", col=colorRampPalette(c('red','red','red','red','red','red','red','#d7191c','#fdae61','#ffffbf','#abd9e9','#2c7bb6'))(11))
   dev.off()
@@ -458,7 +465,7 @@ if(!file.exists('output/fig_koch_1.pdf')){
     print(paste("Doing level",i))
     b <- a %>% filter(level==i)
 
-    p<- ggplot(b) + geom_sf(aes(geometry=geomo)) + 
+    p<- ggplot(b) + geom_sf(aes(geometry=geomo)) +
                 theme_void() +
                 theme(
                   panel.grid.major = element_line(colour = "white"),
@@ -473,7 +480,7 @@ if(!file.exists('output/fig_koch_1.pdf')){
     ggsave(paste0('output/fig_koch_',i,'.pdf'), plot=p, width=1, height=1)
   }
 
-  txt <- a %>% mutate(path=paste0('\\includegraphics[width=0.5in]{output/fig_koch_',level,'.pdf}')) %>% 
+  txt <- a %>% mutate(path=paste0('\\includegraphics[width=0.5in]{output/fig_koch_',level,'.pdf}')) %>%
                select(path,PolsbyPopp,Schwartzbe,CvxHullPS,ReockPS,areaAH,perimSH)
   txt <- txt %>% mutate(
     perPols       = 100*(PolsbyPopp-lag(PolsbyPopp))/PolsbyPopp,
@@ -500,8 +507,8 @@ FindEvil <- function(a, fixid){
 
   #Score compared to a histogram in which districts without a choice of borders
   #are included
-  diffnc <- a %>% 
-        group_by(proj,tol,variable) %>% 
+  diffnc <- a %>%
+        group_by(proj,tol,variable) %>%
         summarise(
           median   = median(value),
           mean     = mean(value),
@@ -514,16 +521,16 @@ FindEvil <- function(a, fixid){
         mutate(
           med_quant  = ecdf(med_diff)(med_diff),
           mean_quant = ecdf(mean_diff)(mean_diff)
-        ) %>% 
+        ) %>%
         mutate(
           choice='nochoice'
         ) %>% rowwise()
 
   #Score compared to a histogram in which district without a choice of
   #boundaries are excluded
-  diffc <- a %>% 
+  diffc <- a %>%
         filter(substr(id,3,4)!='00')     %>%
-        group_by(proj,tol,variable) %>% 
+        group_by(proj,tol,variable) %>%
         summarise(
           median   = median(value),
           mean     = mean(value),
@@ -536,7 +543,7 @@ FindEvil <- function(a, fixid){
         mutate(
           med_quant  = ecdf(med_diff)(med_diff),
           mean_quant = ecdf(mean_diff)(mean_diff)
-        ) %>% 
+        ) %>%
         mutate(
           choice='choice'
         ) %>% rowwise()
@@ -545,11 +552,11 @@ FindEvil <- function(a, fixid){
   diff <- rbind(diffnc,diffc)
 
   #Get the "best practices" score which most clearly indicates this district was gerrymandered
-  bestd <- diff %>% 
-           #filter(proj=='EPSG:102003' & tol==0) %>% 
+  bestd <- diff %>%
+           #filter(proj=='EPSG:102003' & tol==0) %>%
            arrange(desc(mean_diff)) %>% head(n=1)
-  diffd <- diff %>% 
-           #filter(variable==bestd$variable) %>% 
+  diffd <- diff %>%
+           #filter(variable==bestd$variable) %>%
            filter(as.numeric(levels(tol))[tol]<5000) %>% #Limit the degree of simplification
            arrange(mean_diff) %>% head(n=1)
 
@@ -559,13 +566,13 @@ FindEvil <- function(a, fixid){
   #Histogram making the district look bad
   besthist <- a %>% filter(proj==bestd$proj & tol==bestd$tol & variable==bestd$variable)
   if(bestd$choice=='choice'){
-    besthist <- besthist %>% filter(substr(id,3,4)!='00') 
+    besthist <- besthist %>% filter(substr(id,3,4)!='00')
   }
 
   #Histogram making the district look good
   diffhist <- a %>% filter(proj==diffd$proj & tol==diffd$tol & variable==diffd$variable)
   if(diffd$choice=='choice'){
-    diffhist <- diffhist %>% filter(substr(id,3,4)!='00') 
+    diffhist <- diffhist %>% filter(substr(id,3,4)!='00')
   }
 
   print(fixid)
@@ -632,6 +639,6 @@ for(fixid in dists_to_fix){
   figname = paste0('output/fig_evil_by_state_',fixid,'.pdf')
   if(!file.exists(figname)){
     ggsave(figname, plot=p, width=1, height=0.5)
-  }  
+  }
 }
 cat("\\end{tabular}\n")
