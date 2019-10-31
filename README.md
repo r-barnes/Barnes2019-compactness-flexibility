@@ -49,7 +49,7 @@ Figures are known to generate correctly with Python (v3.6.8), R (v3.4.4), and pd
 
 Install bash dependencies:
 
-    sudo apt install shapelib shapetools gdal-bin r-base make cmake python3
+    sudo apt install --no-install-recommends shapelib shapetools gdal-bin r-base make cmake python3 gcc g++ gfortran libudunits2-dev libgdal-dev libpython-dev
 
 Install Python dependencies:
 
