@@ -4,6 +4,6 @@ geojson==2.5.0
 matplotlib==3.0.0
 pandas==0.25.0
 pyproj==1.9.6
-setuptools==41.0.1
+setuptools==65.5.1
 shapely==1.6.4.post2
 wheel==0.33.6
